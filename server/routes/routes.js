@@ -1,11 +1,13 @@
 const express = require('express');
 const signup = require('../auth/signup');
-const { getAllUser, deleteUser } = require('../controller/user');
+const { getAllUser, deleteUser, getEmail } = require('../controller/user');
 const { addTransaction, getTransaction, updateTransaction, deleteTransaction } = require('../controller/transaction');
 const login = require('../auth/login');
 const router = express.Router();   
 const authenticateUser = require('../middleware/authMiddleware');
 const { getCategorizedTransaction, getTransactionStats, getAvgStats,  } = require('../service/transactionService');
+const { verifyToken } = require('../auth/validateToken');
+const { getEmailFromToken } = require('../util/util');
 
 
 router.get('/', async function (req, res){res.json({message: 'Welcome to the Financial Tracking API!'});});
@@ -21,5 +23,8 @@ router.delete('/deletetransaction', authenticateUser,deleteTransaction);
 router.get('/getCategorizedTransaction', authenticateUser, getCategorizedTransaction);
 router.get('/getTransactionStats', authenticateUser, getTransactionStats);
 router.get('/getAvgStats', authenticateUser, getAvgStats);
+
+router.post('/verify', verifyToken);
+router.get('/getEmail', authenticateUser,  getEmail);
 
 module.exports = router;

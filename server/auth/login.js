@@ -9,7 +9,7 @@ const pool = db.promise();
 
 module.exports = async function (req, res, next) {
   const { email, password } = req.body;
-  // check user exist
+  // check user exist 
   if (!(await userAlreadyExists(email))) {
     return res.status(404).json({ message: "Email not found" });
   }

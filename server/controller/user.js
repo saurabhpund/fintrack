@@ -1,6 +1,7 @@
 const db = require("../config/db");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
+const { getEmailFromToken } = require('../util/util');
 const pool = db.promise();
 
 const getAllUser = async function (req, res) {
@@ -11,6 +12,8 @@ const getAllUser = async function (req, res) {
     });
   });
 };
+
+
 
 const userAlreadyExists = async function (email) {
   const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [
@@ -26,10 +29,8 @@ const updateUser = async function (req, res) {
             values.push(value);
         })
     
-        const token = req.headers.authorization.split(' ')[1];
         try{
-            const decode = jwt.decode(token, JWT_SECRET);
-            const email = decode.email;
+          const email = getEmailFromToken(req);
             console.log(fields.join(', '))
                 db.execute(
                     `UPDATE users 
@@ -51,9 +52,7 @@ const updateUser = async function (req, res) {
 };
 
 const deleteUser = async function (req, res) {
-  const token = req.headers.authorization.split(" ")[1];
-  const decode = jwt.decode(token, JWT_SECRET);
-  const email = decode.email;
+  const email = getEmailFromToken(req);
   db.query("delete from users where email = ?", [email], (err, result) => {
     if (err) throw err;
     result.affectedRows === 0
@@ -62,4 +61,12 @@ const deleteUser = async function (req, res) {
   });
 };
 
-module.exports = { getAllUser, userAlreadyExists, deleteUser };
+const getEmail = async function (req, res) {
+  const email = getEmailFromToken(req);
+  if (!email) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  res.status(200).json({ email });
+};
+
+module.exports = { getAllUser, userAlreadyExists, deleteUser, getEmail };

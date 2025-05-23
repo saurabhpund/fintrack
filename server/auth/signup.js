@@ -4,9 +4,9 @@ const bcrypt = require("bcrypt");
 const { userAlreadyExists } = require("../controller/user");
 
 module.exports = async function (req, res, next) {
-  const { email, password, fullname } = req.body;
+  const { email, password, fullName } = req.body;
 
-  if (!email || !password || !fullname) {
+  if (!email || !password || !fullName) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
@@ -18,7 +18,7 @@ module.exports = async function (req, res, next) {
     }
     db.query(
       "INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)",
-      [fullname, email, hash]
+      [fullName, email, hash]
     );
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {

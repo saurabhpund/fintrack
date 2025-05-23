@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const jwt = require('jsonwebtoken');
+const { getEmailFromToken } = require('../util/util');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const addTransaction = async(req, res) => {
@@ -9,8 +10,7 @@ const addTransaction = async(req, res) => {
     }
     const token = req.headers.authorization.split(' ')[1];
     try{
-        const decode = jwt.decode(token, JWT_SECRET);
-        const email = decode.email;
+        const email = getEmailFromToken(req);
             db.query('INSERT INTO transactions(amount, transaction_type, category, descriptions, user_id) values (?, ?, ?, ?, (select id from users where email = ? limit 1))', [amount, type, category, description, email],
                 (err, result) => {
                     if(err) throw err;
@@ -30,9 +30,7 @@ const addTransaction = async(req, res) => {
 }
 
 const getTransaction = async(req, res) => {
-    const token = req.headers.authorization.split(' ')[1];
-    const decode = jwt.decode(token, JWT_SECRET);
-    const email = decode.email;
+    const email = getEmailFromToken(req)
     try{
         db.execute("select t.amount, t.transaction_type, t.transaction_date, t.descriptions, t.id from transactions t join users u on t.user_id = u.id where u.email = ?",[email], (err, result) => {
             res.status(200).json(result);
