@@ -2,8 +2,11 @@ import React from 'react'
 import Header from '../../components/Header'
 import { FaSearch } from 'react-icons/fa'
 import RecordModal from '../../components/RecordModal'
+import useSetTitle from '../../hook/useSetTitle'
+import { ModalContext } from '../../context/RecordModalContext'
 
 const Records = () => {
+  useSetTitle({ title: "Records - Finance Tracker" });
   return (
     <>
     <Header />
@@ -42,12 +45,12 @@ const RecordContainer = () => {
 
 const Filters = () => {
   const [showModal, setShowModal] = React.useState(false);
+  const {toggleRecordModal} = React.useContext(ModalContext);
   return (
     <div className='bg-gray-200 dark:bg-gray-700 rounded-md flex flex-col gap-3'>
       <h1 className='text-3xl font-bold'>Records</h1>
-      <button className="inline-flex w-full  my-4 justify-center text-white items-center bg-blue-500 border-0 py-1 px-3 focus:outline-none hover:bg-blue-600 rounded-full text-base md:mt-0" onClick={() => setShowModal(true)}>+ Add </button>
+      <button className="inline-flex w-full  my-4 justify-center text-white items-center bg-blue-500 border-0 py-1 px-3 focus:outline-none hover:bg-blue-600 rounded-full text-base md:mt-0" onClick={() => toggleRecordModal()}>+ Add </button>
 
-      {showModal && <RecordModal showModal={showModal} setShowModal={setShowModal} />}
 
       {/* create search input with search icon at first and then placeholder */}
       <div className='flex items-center bg-gray-300 dark:bg-gray-600 rounded-md p-2'>

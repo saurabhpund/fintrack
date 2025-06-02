@@ -6,11 +6,15 @@ import Signup from './pages/Signup'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard/Dashboard'
 import Records from './pages/Dashboard/Records'
+import RecordModalContext from './context/RecordModalContext'
+import RecordModal from './components/RecordModal'
 
 function App() {
 
   return (
     <>
+    <RecordModalContext>
+      <RecordModal />
       <BrowserRouter>
          <Routes>
           <Route path={"/"} element={<Home />} />
@@ -23,6 +27,7 @@ function App() {
           <Route path='settings' element={<h1>Settings</h1>} />
          </Routes>
       </BrowserRouter>
+    </RecordModalContext>
       
     </>
   )

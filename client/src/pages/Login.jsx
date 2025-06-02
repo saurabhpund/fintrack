@@ -33,12 +33,11 @@ const Login = () => {
         .then((response) => {
           setLoading(false);
           const { token } = response.data;
-          // Store token
           localStorage.setItem("authToken", token);
-          // Redirect user
           navigate("/dashboard");
         })
         .catch((error) => {
+          setLoading(false);
           console.error("Signup Error:", error.response?.data || error.message);
           console.log(error);
           setErrors({ form: error.response?.data?.message || "Signup failed" });
