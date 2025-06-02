@@ -3,7 +3,7 @@ import logo from "../assets/logo.svg";
 import { FaUser } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import useGetEmail from "../hook/useGetEmail";
-import { ModalContext } from "../context/RecordModalContext";
+import { ModalContext } from "../context/Context";
 
 const Header = () => {
   const email = useGetEmail();

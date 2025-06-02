@@ -1,9 +1,10 @@
 import React from 'react'
 import Header from '../../components/Header'
 import { FaSearch } from 'react-icons/fa'
-import RecordModal from '../../components/RecordModal'
 import useSetTitle from '../../hook/useSetTitle'
-import { ModalContext } from '../../context/RecordModalContext'
+import { ModalContext } from '../../context/Context'
+import DisplayRecords from '../../components/DisplayRecords'
+import axios from 'axios'
 
 const Records = () => {
   useSetTitle({ title: "Records - Finance Tracker" });
@@ -15,8 +16,32 @@ const Records = () => {
   )
 }
 
-
 const RecordContainer = () => {
+const [records, setRecords] = React.useState([]);
+const [loading, setLoading] = React.useState(true);
+const [error, setError] = React.useState(null);
+const { refreshRecords } = React.useContext(ModalContext);
+
+const fetchTransactions = async () => {
+         await axios.get("http://localhost:8000/gettransaction", {
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }).then((response) => {
+        setRecords(response.data)
+        }).catch ((err) => {
+        console.error("Error fetching records:", err);
+        setError("Failed to load transactions.");
+      }).finally(() => {
+        setLoading(false);
+      })
+    };
+
+React.useEffect(() => {
+    fetchTransactions();
+  }, [refreshRecords]);
+
   return (
     // create two column one having filters and one having records
     <div className=' px-10 py-3 dark:text-white dark:bg-gray-800 '>
@@ -35,7 +60,7 @@ const RecordContainer = () => {
         <Filters />
       </div>
       <div className='w-full bg-gray-200 dark:bg-gray-700 p-5 rounded-md'>
-        {/* Add records here */}
+        <DisplayRecords records={records}  />
       </div>
       </div>
     </div>
@@ -44,22 +69,97 @@ const RecordContainer = () => {
 }
 
 const Filters = () => {
-  const [showModal, setShowModal] = React.useState(false);
-  const {toggleRecordModal} = React.useContext(ModalContext);
+  const { toggleRecordModal } = React.useContext(ModalContext);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [selectedCategory, setSelectedCategory] = React.useState("all");
+  const [paymentType, setPaymentType] = React.useState("all");
+
+  const categories = [
+    "food", "shopping", "housing", "transportation",
+    "vehicle", "communication", "investment"
+  ];
+
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("all");
+    setPaymentType("all");
+  };
+
+  const isFiltering = () => {
+    return (
+      searchTerm.trim() !== "" ||
+      selectedCategory !== "all" ||
+      paymentType !== "all"
+    );
+  };
+
   return (
-    <div className='bg-gray-200 dark:bg-gray-700 rounded-md flex flex-col gap-3'>
-      <h1 className='text-3xl font-bold'>Records</h1>
-      <button className="inline-flex w-full  my-4 justify-center text-white items-center bg-blue-500 border-0 py-1 px-3 focus:outline-none hover:bg-blue-600 rounded-full text-base md:mt-0" onClick={() => toggleRecordModal()}>+ Add </button>
+    <div className="bg-gray-200 dark:bg-gray-700 rounded-md flex flex-col gap-5">
+      <h1 className="text-2xl font-bold">Filters</h1>
 
+      {/* Add Record Button */}
+      <button
+        onClick={toggleRecordModal}
+        className="w-full text-white bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded-full"
+      >
+        + Add
+      </button>
 
-      {/* create search input with search icon at first and then placeholder */}
-      <div className='flex items-center bg-gray-300 dark:bg-gray-600 rounded-md p-2'>
-        <FaSearch className='text-gray-500' />
-        <input type="text" placeholder='Search' className='bg-transparent outline-none ml-2' />
-        </div>
+      {/* Search Input */}
+      <div className="flex items-center bg-gray-300 dark:bg-gray-600 rounded-md px-3 py-2">
+        <FaSearch className="text-gray-500" />
+        <input
+          type="text"
+          placeholder="Search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="bg-transparent outline-none ml-2 w-full text-sm"
+        />
+      </div>
 
+      {/* Category Filter */}
+      <div className="flex flex-col">
+        <label className="mb-1 font-semibold text-sm">Category</label>
+        <select
+          className="p-2 rounded bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-none"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          <option value="all">All</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat.charAt(0).toUpperCase() + cat.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Payment Type Filter */}
+      <div className="flex flex-col">
+        <label className="mb-1 font-semibold text-sm">Payment Type</label>
+        <select
+          className="p-2 rounded bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-none"
+          value={paymentType}
+          onChange={(e) => setPaymentType(e.target.value)}
+        >
+          <option value="all">All</option>
+          <option value="cash">Cash</option>
+          <option value="online">Online</option>
+        </select>
+      </div>
+
+      {/* Conditionally Render Reset Button */}
+      {isFiltering() && (
+        <button
+          onClick={handleResetFilters}
+          className="mt-4 w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded-full text-sm"
+        >
+          Reset Filters
+        </button>
+      )}
     </div>
-  )
-}
+  );
+};
+
 
 export default Records

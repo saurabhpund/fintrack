@@ -6,8 +6,9 @@ import Signup from './pages/Signup'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard/Dashboard'
 import Records from './pages/Dashboard/Records'
-import RecordModalContext from './context/RecordModalContext'
-import RecordModal from './components/RecordModal'
+import RecordModalContext from './context/Context'
+import RecordModal from './components/RecordModal/RecordModal'
+import { ToastContainer } from 'react-toastify'
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
     <>
     <RecordModalContext>
       <RecordModal />
+      <ToastContainer position="top-right" autoClose={3000} />
       <BrowserRouter>
          <Routes>
           <Route path={"/"} element={<Home />} />
