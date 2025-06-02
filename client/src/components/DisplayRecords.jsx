@@ -3,6 +3,7 @@ import { categories } from "./RecordModal/CategorySelect";
 
 const DisplayRecords = ({ records = [] }) => {
   const [selectedRecords, setSelectedRecords] = React.useState([]);
+  const checkAllRef = React.useRef();
 
   const handleCheckboxChange = (id) => {
     setSelectedRecords((prev) =>
@@ -29,6 +30,7 @@ const DisplayRecords = ({ records = [] }) => {
           <input
             type="checkbox"
             checked={selectedRecords.length === records.length && records.length > 0}
+            ref={checkAllRef}
             onChange={() =>
               setSelectedRecords(
                 selectedRecords.length === records.length
@@ -37,8 +39,11 @@ const DisplayRecords = ({ records = [] }) => {
               )
             }
           />
-          <label className="text-sm font-medium">Select</label>
+          <label className="text-sm font-medium">{selectedRecords.length > 0 ? "Deselect All" : "Select All"}</label>
         </div>
+
+        {selectedRecords.length > 0 && 
+            <p>{selectedRecords.length} selected record <button  className="rounded-full text-sm px-4 bg-red-500">Delete</button></p>}
 
         <div className="text-sm font-semibold">
           Total:{" "}
@@ -56,7 +61,7 @@ const DisplayRecords = ({ records = [] }) => {
           {records.map((record) => (
             <li
               key={record.id}
-              className="flex items-center gap-3 text-sm bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700 overflow-hidden"
+              className="flex items-center gap-3 text-md bg-white dark:bg-gray-800 p-4 rounded border border-gray-200 dark:border-gray-700 overflow-hidden"
             >
               <input
                 type="checkbox"
